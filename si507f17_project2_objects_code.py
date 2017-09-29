@@ -85,8 +85,20 @@ print("\n***** PROBLEM 1 *****\n")
 ## - a special representation method, which returns "ITUNES MEDIA: <itunes id>" with the iTunes id number for the piece of media (e.g. the track) only in place of "<itunes id>"
 ## - a special len method, which, for the Media class, returns 0 no matter what. (The length of an audiobook might mean something different from the length of a song, depending on how you want to define them!)
 ## - a special contains method (for the in operator) which takes one additional input, as all contains methods must, which should always be a string, and checks to see if the string input to this contains method is INSIDE the string representing the title of this piece of media (the title instance variable)
-
-
+class Media():
+    def __init__(self,itunes_dict):
+        self.title = itunes_dict['trackName']
+        self.author = itunes_dict['artistName']
+        self.itunes_URL = itunes_dict['trackViewUrl']
+        self.itunes_id = itunes_dict['trackId']
+    def __str__(self):
+        return "{} by {}".format(self.title,self.author)
+    def __repr__(self):
+        return "ITUNES MEDIA: {}".format(self.itunes_id)
+    def __len__(self):
+        return 0
+    def __contains__(self, item):
+        return item in self.title
 
 ## [PROBLEM 2] [400 POINTS]
 print("\n***** PROBLEM 2 *****\n")
@@ -96,7 +108,7 @@ print("\n***** PROBLEM 2 *****\n")
 ## class Song
 ## class Movie
 
-## In the class definitions, you can assume a programmer would pass to each class's constructor only a dictionary that represented the correct media type (song, movie).
+## ???  In the class definitions, you can assume a programmer would pass to each class's constructor only a dictionary that represented the correct media type (song, movie).
 
 ## Below follows a description of how each of these should be different from the Media parent class.
 
@@ -108,8 +120,15 @@ print("\n***** PROBLEM 2 *****\n")
 ## - genre (the primary genre name from the data iTunes gives you)
 
 ## Should have the len method overridden to return the number of seconds in the song. (HINT: The data supplies number of milliseconds in the song... How can you access that data and convert it to seconds?)
-
-
+class Song(Media):
+    def __init__(self,itunes_dict):
+        Media.__init__(self,itunes_dict)
+        self.album = itunes_dict['collectionName']
+        self.track_number = itunes_dict['trackNumber']
+        self.genre = itunes_dict['primaryGenreName']
+        self.length = itunes_dict['trackTimeMillis']
+    def __len__(self):
+        return int(self.length/1000)
 
 ### class Movie:
 
@@ -122,8 +141,25 @@ print("\n***** PROBLEM 2 *****\n")
 ## Should have the len method overridden to return the number of minutes in the movie (HINT: The data returns the number of milliseconds in the movie... how can you convert that to minutes?)
 
 ## Should have an additional method called title_words_num that returns an integer representing the number of words in the movie description. If there is no movie description, this method should return 0.
+class Movie(Media):
+    def __init__(self, itunes_dict):
+        Media.__init__(self,itunes_dict)
+        self.rating = itunes_dict['contentAdvisoryRating']
+        self.genre = itunes_dict['primaryGenreName']
+        self.description = itunes_dict['longDescription']
+        if 'trackTimeMillis' in itunes_dict.keys():
+            self.length = itunes_dict['trackTimeMillis']
+        else:
+            self.length = 0
+    def __len__(self):
+        return int(self.length/1000/60)
 
-
+    def title_words_num(self):
+        num = 0
+        for letter in self.description:
+            if letter == ' ':
+                num = num+1
+        return num
 
 ## [PROBLEM 3] [150 POINTS]
 print("\n***** PROBLEM 3 *****\n")
@@ -150,9 +186,18 @@ movie_samples = sample_get_cache_itunes_data("love","movie")["results"]
 ## a list of Movie objects saved in a variable movie_list.
 
 ## You may use any method of accumulation to make that happen.
+media_list = []
+song_list = []
+movie_list = []
 
+for dict in media_samples:
+    media_list.append(Media(dict))
+for dict in song_samples:
+    song_list.append(Song(dict))
+for dict in movie_samples:
+    movie_list.append(Movie(dict))
 
-
+print(movie_list[0])
 
 ## [PROBLEM 4] [200 POINTS]
 print("\n***** PROBLEM 4 *****\n")
@@ -168,6 +213,15 @@ print("\n***** PROBLEM 4 *****\n")
 # - id 
 # - url (for the itunes url of that thing -- the url to view that track of media on iTunes) 
 # - length 
+outfile = open('media.csv',"w")
+outfile.write("title, artist, id, url, length\n")
+for media in media_list:
+    outfile.write('"{}",{},{},{},{}\n'.format(media.title,media.author,media.itunes_id, media.itunes_URL, len(media)))
+for song in song_list:
+    outfile.write('"{}",{},{},{},{}\n'.format(song.title,song.author,song.itunes_id, song.itunes_URL, len(song)))
+for movie in movie_list:
+    outfile.write('"{}",{},{},{},{}\n'.format(movie.title,movie.author,movie.itunes_id, movie.itunes_URL, len(movie)))
+
 
 ## There are no provided tests for this problem -- you should check your CSV files to see that they fit this description to see if this problem worked correctly for you. IT IS VERY IMPORTANT THAT YOUR CSV FILES HAVE EXACTLY THOSE NAMES!
 

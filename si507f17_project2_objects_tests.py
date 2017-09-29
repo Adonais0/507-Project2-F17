@@ -10,7 +10,7 @@ class Problem1(unittest.TestCase):
 		songdata1 = search_data1[0]
 		songdata2 = search_data1[1]
 		search_data2 = sample_get_cache_itunes_data("ratatouille")["results"]
-		self.m1inst = Media(search_data1[0])
+		self.m1inst = Media(search_data1[1])
 		self.m2inst = Media(search_data2[0])
 
 	def test_constructor_media(self):
