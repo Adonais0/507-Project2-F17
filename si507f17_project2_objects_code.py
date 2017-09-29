@@ -217,8 +217,14 @@ outfile = open('media.csv',"w")
 outfile.write("title, artist, id, url, length\n")
 for media in media_list:
     outfile.write('"{}",{},{},{},{}\n'.format(media.title,media.author,media.itunes_id, media.itunes_URL, len(media)))
+
+outfile = open('song.csv',"w")
+outfile.write("title, artist, id, url, length\n")
 for song in song_list:
     outfile.write('"{}",{},{},{},{}\n'.format(song.title,song.author,song.itunes_id, song.itunes_URL, len(song)))
+
+outfile = open('movie.csv',"w")
+outfile.write("title, artist, id, url, length\n")
 for movie in movie_list:
     outfile.write('"{}",{},{},{},{}\n'.format(movie.title,movie.author,movie.itunes_id, movie.itunes_URL, len(movie)))
 
